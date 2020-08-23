@@ -1,5 +1,6 @@
 package com.elon.service;
 
+import com.elon.datamanager.TaskManager;
 import com.elon.model.MutiLinkedBlockingDeque;
 import com.elon.model.Task;
 
@@ -19,6 +20,7 @@ public class ProConsService {
      * @author elon
      */
     public void startTask(int taskAmount) {
+        TaskManager.instance().clearTerminateFlag();
         LinkedBlockingDeque<Task> blockingDeque = new LinkedBlockingDeque<>();
 
         Producer producer = new Producer(blockingDeque, taskAmount);
@@ -37,6 +39,7 @@ public class ProConsService {
      * @author elon
      */
     public void startMutiTask(int taskAmount, int consumerThreadAmount) {
+        TaskManager.instance().clearTerminateFlag();
         MutiLinkedBlockingDeque blockingDeque = new MutiLinkedBlockingDeque(consumerThreadAmount);
 
         Producer producer = new Producer(blockingDeque, taskAmount);

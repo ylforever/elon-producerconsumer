@@ -1,6 +1,7 @@
 package com.elon.service;
 
 import com.elon.constant.EnumTaskEndType;
+import com.elon.datamanager.TaskManager;
 import com.elon.model.MutiLinkedBlockingDeque;
 import com.elon.model.Task;
 import org.apache.logging.log4j.LogManager;
@@ -39,11 +40,20 @@ public class MutiConsumer implements Runnable {
                     return;
                 }
 
+                // 处理任务被用户终止的场景
+                if (TaskManager.instance().isTaskTerminated()) {
+                    Task terminateTask = new Task();
+                    terminateTask.setTaskName("任务终止毒丸");
+                    terminateTask.setTaskEndType(EnumTaskEndType.TERMINATE);
+                    blockingDeque.offerFirst(terminateTask);
+                    continue;
+                }
+
                 // 消费任务(等待10秒，模拟实际业务处理时间)
                 LOGGER.info("消费任务.{}", task);
                 Thread.sleep(10*1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("消费任务异常.", e);
             }
         }
     }

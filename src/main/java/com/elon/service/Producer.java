@@ -1,6 +1,7 @@
 package com.elon.service;
 
 import com.elon.constant.EnumTaskEndType;
+import com.elon.datamanager.TaskManager;
 import com.elon.model.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +29,15 @@ public class Producer implements Runnable {
 
     @Override
     public void run() {
+        EnumTaskEndType taskEndType = EnumTaskEndType.COMPLETE;
         for (int i = 1; i <= taskAmount; ++i) {
             try {
+                // 处理任务被用户终止的场景
+                if (TaskManager.instance().isTaskTerminated()) {
+                    taskEndType = EnumTaskEndType.TERMINATE;
+                    break;
+                }
+
                 Task task = new Task();
                 task.setTaskName("任务：" + i);
                 blockingDeque.offer(task, 2, TimeUnit.MILLISECONDS);
@@ -43,10 +51,10 @@ public class Producer implements Runnable {
         try {
             Task task = new Task();
             task.setTaskName("任务处理结束毒丸");
-            task.setTaskEndType(EnumTaskEndType.COMPLETE);
+            task.setTaskEndType(taskEndType);
             blockingDeque.offer(task, 2, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error("放入毒丸任务异常.", e);
         }
     }
 }

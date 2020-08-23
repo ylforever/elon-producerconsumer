@@ -1,5 +1,6 @@
 package com.elon.rest;
 
+import com.elon.datamanager.TaskManager;
 import com.elon.service.ProConsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,5 +32,14 @@ public class ProduceConsumerController {
                               @PathVariable("consumerThreadAmount") int consumerThreadAmount) {
         ProConsService proConsService = new ProConsService();
         proConsService.startMutiTask(taskAmount, consumerThreadAmount);
+    }
+
+    /**
+     * 终止任务
+     */
+    @PostMapping("/terminate-task")
+    @ApiOperation(value = "终止任务")
+    public void terminateTask() {
+        TaskManager.instance().terminateTask();
     }
 }
